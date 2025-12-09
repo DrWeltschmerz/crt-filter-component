@@ -98,34 +98,61 @@
 
     /* Input demo */
     .input-demo {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 20px;
-      align-items: center;
-      max-width: 400px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      color: #ffd700;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
     .input-row {
-      width: 100%;
-      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .progress-row {
       width: 100%;
     }
 
-    .button-row {
+    /* Button demo */
+    .button-demo {
       display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
+      flex-direction: row;
+      gap: 60px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
     }
 
-    .button-label {
-      min-width: 80px;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.9rem;
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      min-width: 200px;
+    }
+
+    .button-group .button-label {
+      margin-bottom: 8px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     /* Interactive demo */
@@ -373,24 +400,30 @@
     </p>
 
     <div class="button-demo">
-      <div class="button-row">
+      <div class="button-group">
         <span class="button-label">Primary:</span>
-        <jrpg-button>Attack</jrpg-button>
-        <jrpg-button variant="secondary">Defend</jrpg-button>
-        <jrpg-button variant="danger">Limit Break</jrpg-button>
+        <div class="button-row">
+          <jrpg-button>Attack</jrpg-button>
+          <jrpg-button variant="secondary">Defend</jrpg-button>
+          <jrpg-button variant="danger">Limit Break</jrpg-button>
+        </div>
       </div>
 
-      <div class="button-row">
+      <div class="button-group">
         <span class="button-label">Sizes:</span>
-        <jrpg-button size="small">Small</jrpg-button>
-        <jrpg-button size="medium">Medium</jrpg-button>
-        <jrpg-button size="large">Large</jrpg-button>
+        <div class="button-row">
+          <jrpg-button size="small">Small</jrpg-button>
+          <jrpg-button size="medium">Medium</jrpg-button>
+          <jrpg-button size="large">Large</jrpg-button>
+        </div>
       </div>
 
-      <div class="button-row">
+      <div class="button-group">
         <span class="button-label">Disabled:</span>
-        <jrpg-button disabled>Can't Use</jrpg-button>
-        <jrpg-button variant="secondary" disabled>Locked</jrpg-button>
+        <div class="button-row">
+          <jrpg-button disabled>Can't Use</jrpg-button>
+          <jrpg-button variant="secondary" disabled>Locked</jrpg-button>
+        </div>
       </div>
     </div>
   </section>
@@ -428,19 +461,19 @@
     </p>
 
     <div class="input-demo">
-      <div class="input-row">
-        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Character Name:</label>
-        <jrpg-input placeholder="Enter your name" width="250px"></jrpg-input>
+      <div class="input-group">
+        <label>Character Name:</label>
+        <jrpg-input placeholder="Enter your name" width="200px"></jrpg-input>
       </div>
 
-      <div class="input-row">
-        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Password:</label>
-        <jrpg-input type="password" placeholder="Enter password" width="250px"></jrpg-input>
+      <div class="input-group">
+        <label>Password:</label>
+        <jrpg-input type="password" placeholder="Enter password" width="200px"></jrpg-input>
       </div>
 
-      <div class="input-row">
-        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Email:</label>
-        <jrpg-input type="email" placeholder="your@email.com" width="250px"></jrpg-input>
+      <div class="input-group">
+        <label>Email:</label>
+        <jrpg-input type="email" placeholder="your@email.com" width="200px"></jrpg-input>
       </div>
     </div>
   </section>
@@ -522,7 +555,7 @@
           <div slot="item">Items</div>
         </jrpg-menu>
 
-        <jrpg-card id="character-info-card" title="Character Info" width="250px">
+        <jrpg-card id="character-info-card" title="Character Info" width="320px">
           <p><strong>Name:</strong> <span id="char-name">Cloud Strife</span></p>
           <div style="margin: 10px 0;">
             <jrpg-input id="name-input" placeholder="Rename character" width="200px" style="display: none;"></jrpg-input>
@@ -534,8 +567,13 @@
           <div style="margin: 25px 0;">
             <jrpg-progress id="char-mp-bar" value="180" max="200" label="MP" size="small"></jrpg-progress>
           </div>
+          <div style="margin: 15px 0;">
+            <jrpg-input id="command-input" placeholder="Enter command..." width="200px"></jrpg-input>
+          </div>
           <div style="margin-top: 15px;">
             <jrpg-button id="rename-btn" size="small">Rename</jrpg-button>
+            <jrpg-button id="damage-btn" size="small" variant="danger" style="margin-left: 5px;">Damage</jrpg-button>
+            <jrpg-button id="heal-btn" size="small" variant="secondary" style="margin-left: 5px;">Heal</jrpg-button>
           </div>
         </jrpg-card>
 
@@ -887,6 +925,108 @@
         renameBtn.textContent = 'Rename';
       }
     });
+
+    // Command input functionality
+    const commandInput = document.getElementById('command-input');
+    commandInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const command = e.target.value.trim().toLowerCase();
+        if (command) {
+          handleCommand(command);
+          commandInput.value = ''; // Clear input
+        }
+      }
+    });
+
+    // Damage and Heal button functionality
+    const damageBtn = document.getElementById('damage-btn');
+    const healBtn = document.getElementById('heal-btn');
+
+    damageBtn.addEventListener('jrpg-click', () => {
+      modifyHP(-50); // Reduce HP by 50
+    });
+
+    healBtn.addEventListener('jrpg-click', () => {
+      modifyHP(30); // Increase HP by 30
+    });
+
+    // Function to handle commands
+    function handleCommand(command) {
+      const dialog = document.getElementById('dialog-box');
+      let response = '';
+
+      switch(command) {
+        case 'help':
+          response = 'Available commands: help, status, attack, magic, item, damage, heal';
+          break;
+        case 'status':
+          const hpBar = document.getElementById('char-hp-bar');
+          const mpBar = document.getElementById('char-mp-bar');
+          const currentHP = hpBar.getAttribute('value');
+          const maxHP = hpBar.getAttribute('max');
+          const currentMP = mpBar.getAttribute('value');
+          const maxMP = mpBar.getAttribute('max');
+          response = `HP: ${currentHP}/${maxHP}, MP: ${currentMP}/${maxMP}`;
+          break;
+        case 'attack':
+          response = 'You swing your weapon with great force!';
+          modifyMP(-10); // Use some MP
+          break;
+        case 'magic':
+          response = 'You cast a powerful spell!';
+          modifyMP(-25); // Use more MP
+          break;
+        case 'item':
+          response = 'You use a healing potion!';
+          modifyHP(50);
+          break;
+        case 'damage':
+          modifyHP(-30);
+          response = 'You take damage!';
+          break;
+        case 'heal':
+          modifyHP(40);
+          response = 'You feel restored!';
+          break;
+        default:
+          response = `Unknown command: ${command}. Type 'help' for available commands.`;
+      }
+
+      dialog.setAttribute('speaker', 'System');
+      dialog.setAttribute('text', response);
+      dialog.setAttribute('theme', currentTheme);
+      dialog.setAttribute('primary-color', themes[currentTheme].dialog.primary);
+    }
+
+    // Function to modify HP
+    function modifyHP(amount) {
+      const hpBar = document.getElementById('char-hp-bar');
+      const currentHP = parseInt(hpBar.getAttribute('value'));
+      const maxHP = parseInt(hpBar.getAttribute('max'));
+      const newHP = Math.max(0, Math.min(maxHP, currentHP + amount));
+      hpBar.setAttribute('value', newHP);
+
+      // Update portrait HP display
+      const selectedChar = document.querySelector('jrpg-portrait.selected');
+      if (selectedChar) {
+        selectedChar.setAttribute('hp', `${newHP}/${maxHP}`);
+      }
+    }
+
+    // Function to modify MP
+    function modifyMP(amount) {
+      const mpBar = document.getElementById('char-mp-bar');
+      const currentMP = parseInt(mpBar.getAttribute('value'));
+      const maxMP = parseInt(mpBar.getAttribute('max'));
+      const newMP = Math.max(0, Math.min(maxMP, currentMP + amount));
+      mpBar.setAttribute('value', newMP);
+
+      // Update portrait MP display
+      const selectedChar = document.querySelector('jrpg-portrait.selected');
+      if (selectedChar) {
+        selectedChar.setAttribute('mp', `${newMP}/${maxMP}`);
+      }
+    }
 
     // Initialize with sharp theme and select Cloud
     applyTheme('sharp');
