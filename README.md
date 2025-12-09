@@ -331,10 +331,12 @@ customElements.whenDefined('crt-overlay').then(() => {
 
 ## Demos
 
-- **[Main Demo](https://drweltschmerz.github.io/crt-filter-component/)** - Full showcase with code examples and all features
-- **[Playground](https://drweltschmerz.github.io/crt-filter-component/crt-demo.html)** - Isolated sandbox with diverse content and effects
-- **[Scoped Barrel](https://drweltschmerz.github.io/crt-filter-component/scoped-crt-demo.html)** - Barrel distortion applied to specific selector
-- **[Z-Index Test](https://drweltschmerz.github.io/crt-filter-component/z-index-test.html)** - Interactive z-index layering demonstration
+Live at: **https://drweltschmerz.github.io/crt-filter-component/**
+
+- **[Main Demo](demo/original-crt-demo.html)** - Full showcase with code examples and all features
+- **[Playground](demo/crt-demo.html)** - Isolated sandbox with diverse content and effects
+- **[Scoped Barrel](demo/scoped-crt-demo.html)** - Barrel distortion applied to specific selector
+- **[Z-Index Test](demo/z-index-test.html)** - Interactive z-index layering demonstration
 
 ## Browser Support
 

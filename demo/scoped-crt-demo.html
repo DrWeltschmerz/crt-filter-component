@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CRT Overlay Demo - Playground</title>
+  <title>CRT Overlay Demo - Scoped Barrel</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -70,6 +70,12 @@
     .card h2 { margin: 0 0 8px; font-size: 1.15rem; color: #ffb35c; }
     .card p { margin: 0 0 10px; color: rgba(230,247,255,0.82); line-height: 1.6; }
 
+    .scoped-target {
+      background: linear-gradient(180deg, rgba(255,138,31,0.1), rgba(74,163,225,0.08));
+      border: 2px dashed rgba(255,138,31,0.4);
+    }
+    .scoped-target h2 { color: #ff8a1f; }
+
     .gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -97,16 +103,6 @@
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(74,163,225,0.2); }
     .btn.alt { color: #ffb35c; border-color: rgba(255,138,31,0.4); box-shadow: 0 10px 30px rgba(255,138,31,0.2); }
-
-    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
-    .pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      font-size: 0.9rem;
-      color: rgba(230,247,255,0.8);
-    }
 
     .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: start; }
     .panel {
@@ -142,67 +138,58 @@
   <div class="bg-image"></div>
   <div class="nav-links">
     <a href="original-crt-demo.html">Main</a>
-    <a href="crt-demo.html" class="active">Playground</a>
-    <a href="scoped-crt-demo.html">Scoped Barrel</a>
+    <a href="crt-demo.html">Playground</a>
+    <a href="scoped-crt-demo.html" class="active">Scoped Barrel</a>
     <a href="z-index-test.html">Z-Index Test</a>
   </div>
 
   <div class="demo-wrapper">
     <div class="page">
       <header>
-        <h1>CRT Overlay Playground</h1>
-        <p>Test the overlay with diverse content to stress all the effects.</p>
+        <h1>Scoped Barrel Distortion</h1>
+        <p>Barrel distortion applied only to the highlighted card below. Other content stays straight.</p>
       </header>
 
-      <main class="stack demo-surface">
-        <section class="card">
-          <h2>Hero & buttons</h2>
-          <p>Bright CTAs to see how bloom and fringe interact with strong edges.</p>
-          <div class="buttons">
-            <a class="btn" href="#">Primary</a>
-            <a class="btn alt" href="#">Secondary</a>
-            <a class="btn" href="#">Ghost</a>
-          </div>
-          <div class="cta-row">
-            <span class="pill">Scanlines</span>
-            <span class="pill">Phosphor triads</span>
-            <span class="pill">Barrel: 2</span>
-            <span class="pill">Bloom: 0.15</span>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Mixed gallery</h2>
-          <p>Multiple images to see color handling, bloom, and chroma fringe at edges.</p>
+      <main class="stack">
+        <section class="card scoped-target">
+          <h2>Target: Barrel distortion applied here</h2>
+          <p>This card is the target for <code>apply-barrel-to=".scoped-target"</code>. Only this element will have the barrel curvature effect applied. All other overlay effects (scanlines, bloom, fringe, noise) render over the entire viewport.</p>
           <div class="gallery">
-            <img src="https://picsum.photos/seed/crt-sky/800/500" alt="Skyline">
-            <img src="https://picsum.photos/seed/crt-neon/600/500" alt="Neon">
-            <img src="https://picsum.photos/seed/crt-glass/700/500" alt="Glass">
-            <img src="https://picsum.photos/seed/crt-forest/600/500" alt="Forest">
+            <img src="https://picsum.photos/seed/scope-1/800/400" alt="Scoped 1">
+            <img src="https://picsum.photos/seed/scope-2/700/400" alt="Scoped 2">
+          </div>
+          <div class="buttons">
+            <a class="btn" href="#">Action</a>
+            <a class="btn alt" href="#">Secondary</a>
           </div>
         </section>
 
         <section class="card">
-          <h2>Text blocks</h2>
+          <h2>Outside target</h2>
+          <p>This card is <strong>not</strong> targeted by barrel distortion. It remains undistorted while the scoped card above curves with the barrel effect. Useful when you only want the CRT curvature on a hero section or specific media block.</p>
+        </section>
+
+        <section class="card">
+          <h2>How it works</h2>
           <div class="split">
             <div class="panel">
-              <h3>Body copy</h3>
-              <p>The CRT overlay layers sit on top of the viewport. Use the controls (top-right) to adjust the mode between behind and on top, and tweak all parameters in real-time.</p>
+              <h3>Scoped approach</h3>
+              <p>The <code>apply-barrel-to</code> attribute targets a CSS selector. The barrel distortion SVG filter only renders on that element, leaving the rest of the page flat.</p>
             </div>
             <div class="panel">
-              <h3>Barrel distortion</h3>
-              <p>Barrel distortion is aimed at <code>.demo-surface</code> via <code>apply-barrel-to</code>. All other effects live in the shadow DOM and render over the viewport.</p>
+              <h3>Mode control</h3>
+              <p>Use the controls (top-right) to switch between Behind and On Top modes. Both work independently of the barrel scoping.</p>
             </div>
           </div>
         </section>
 
         <section class="card">
-          <h2>List & features</h2>
+          <h2>Features demonstrated</h2>
           <ul class="list">
-            <li><strong>Navigation</strong> — Links at top-left for easy demo switching.</li>
-            <li><strong>Mode control</strong> — Toggle between Behind and On Top from the controls panel.</li>
-            <li><strong>Barrel distortion</strong> — Scoped to the demo content area for isolation.</li>
-            <li><strong>Real-time adjustment</strong> — All parameters sync with controls instantly.</li>
+            <li><strong>Scoped barrel</strong> — Distortion limited to <code>.scoped-target</code> class.</li>
+            <li><strong>Global effects</strong> — Scanlines, bloom, fringe cover the entire viewport.</li>
+            <li><strong>Mode switching</strong> — Toggle behind/on top behavior from controls.</li>
+            <li><strong>Visual hierarchy</strong> — Navigation stays at z-index 1000, always accessible.</li>
           </ul>
         </section>
       </main>
@@ -210,7 +197,7 @@
   </div>
 
   <script type="module">
-    import 'component/crt-overlay.js';
+    import '../component/crt-overlay.js';
   </script>
 
   <crt-overlay
@@ -225,6 +212,7 @@
     bloom="0.15"
     flicker
     controls
+    apply-barrel-to=".scoped-target"
     mode="1"
   ></crt-overlay>
 
