@@ -266,12 +266,19 @@
       min-width: 120px;
     }
 
-    /* Component grid for cards */
-    .component-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin: 20px 0;
+    /* Toast demo */
+    .toast-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
   </style>
 </head>
@@ -478,33 +485,41 @@
     </div>
   </section>
 
-  <!-- Interactive Demo -->
+  <!-- Toast Component Demo -->
   <section class="demo-section">
-    <h2 class="section-title">JRPG Card Component</h2>
+    <h2 class="section-title">Toast Notifications</h2>
     <p class="section-description">
-      Content cards with ornate borders and hover effects. Perfect for displaying information, stats, or notifications.
+      Non-intrusive notifications for battle results, item pickups, quest updates, and general feedback.
+      Features auto-dismiss, click-to-close, and multiple position options.
     </p>
 
-    <div class="component-grid">
-      <jrpg-card title="Character Info" width="280px">
-        <p><strong>Name:</strong> Cloud Strife</p>
-        <p><strong>Level:</strong> 45</p>
-        <p><strong>Class:</strong> SOLDIER</p>
-        <p><strong>HP:</strong> 1250/1250</p>
-      </jrpg-card>
+    <div class="toast-demo">
+      <div class="demo-controls">
+        <jrpg-button id="show-success-toast">Success Toast</jrpg-button>
+        <jrpg-button id="show-error-toast">Error Toast</jrpg-button>
+        <jrpg-button id="show-warning-toast">Warning Toast</jrpg-button>
+        <jrpg-button id="show-info-toast">Info Toast</jrpg-button>
+        <jrpg-button id="show-battle-toast">Battle Toast</jrpg-button>
+        <jrpg-button id="show-item-toast">Item Toast</jrpg-button>
+        <jrpg-button id="show-quest-toast">Quest Toast</jrpg-button>
+      </div>
+    </div>
+  </section>
 
-      <jrpg-card title="Equipment" width="280px">
-        <p><strong>Weapon:</strong> Buster Sword</p>
-        <p><strong>Armor:</strong> SOLDIER Uniform</p>
-        <p><strong>Accessory:</strong> Mythril Armlet</p>
-      </jrpg-card>
+  <section class="demo-section">
+    <h2 class="section-title">Tooltips</h2>
+    <p class="section-description">
+      Contextual information displays with auto-positioning, rich content support, and JRPG theming.
+      Perfect for item descriptions, stat explanations, and help text.
+    </p>
 
-      <jrpg-card title="Magic" width="280px">
-        <div slot="footer-content">Click to cast</div>
-        <p><strong>Fire:</strong> Level 3</p>
-        <p><strong>Thunder:</strong> Level 2</p>
-        <p><strong>Barrier:</strong> Level 1</p>
-      </jrpg-card>
+    <div class="tooltip-demo">
+      <div class="demo-controls">
+        <jrpg-button id="show-item-tooltip">Item Tooltip</jrpg-button>
+        <jrpg-button id="show-stat-tooltip">Stat Tooltip</jrpg-button>
+        <jrpg-button id="show-quest-tooltip">Quest Tooltip</jrpg-button>
+        <jrpg-button id="show-skill-tooltip">Skill Tooltip</jrpg-button>
+      </div>
     </div>
   </section>
 
@@ -605,6 +620,18 @@
     controls
   ></crt-overlay>
 
+  <!-- Toast Notifications -->
+  <jrpg-toast id="success-toast" type="success" position="top-right" duration="3000"></jrpg-toast>
+  <jrpg-toast id="error-toast" type="error" position="top-right" duration="4000"></jrpg-toast>
+  <jrpg-toast id="warning-toast" type="warning" position="top-right" duration="3500"></jrpg-toast>
+  <jrpg-toast id="info-toast" type="info" position="top-right" duration="3000"></jrpg-toast>
+  <jrpg-toast id="battle-toast" type="battle" position="top-right" duration="2500"></jrpg-toast>
+  <jrpg-toast id="item-toast" type="item" position="top-right" duration="3000"></jrpg-toast>
+  <jrpg-toast id="quest-toast" type="quest" position="top-right" duration="4000"></jrpg-toast>
+
+  <!-- Tooltip Component -->
+  <jrpg-tooltip id="main-tooltip"></jrpg-tooltip>
+
   <!-- Load Components -->
   <script type="module">
     import '../component/crt-overlay.js';
@@ -615,6 +642,8 @@
     import '../component/jrpg-card.js';
     import '../component/jrpg-progress.js';
     import '../component/jrpg-input.js';
+    import '../component/jrpg-toast.js';
+    import '../component/jrpg-tooltip.js';
   </script>
 
   <!-- Interactive Demo Logic -->
@@ -788,6 +817,9 @@
         applyTheme(themeKey);
       });
     });
+
+    // Initialize theme on page load
+    applyTheme('sharp');
 
     // Character data
     const characters = {
@@ -971,22 +1003,27 @@
         case 'attack':
           response = 'You swing your weapon with great force!';
           modifyMP(-10); // Use some MP
+          showToast('battle', 'Attack successful! 85 damage dealt.');
           break;
         case 'magic':
           response = 'You cast a powerful spell!';
           modifyMP(-25); // Use more MP
+          showToast('battle', 'Fire spell cast! 120 damage dealt.');
           break;
         case 'item':
           response = 'You use a healing potion!';
           modifyHP(50);
+          showToast('item', 'Potion used. HP restored by 50!');
           break;
         case 'damage':
           modifyHP(-30);
           response = 'You take damage!';
+          showToast('warning', '30 damage received!');
           break;
         case 'heal':
           modifyHP(40);
           response = 'You feel restored!';
+          showToast('success', 'Restored 40 HP!');
           break;
         default:
           response = `Unknown command: ${command}. Type 'help' for available commands.`;
@@ -996,6 +1033,17 @@
       dialog.setAttribute('text', response);
       dialog.setAttribute('theme', currentTheme);
       dialog.setAttribute('primary-color', themes[currentTheme].dialog.primary);
+    }
+
+    // Function to show toast notifications
+    function showToast(type, message) {
+      const toastId = `${type}-toast`;
+      const toast = document.getElementById(toastId);
+      if (toast) {
+        toast.setAttribute('message', message);
+        toast.setAttribute('theme', currentTheme);
+        toast.show();
+      }
     }
 
     // Function to modify HP
@@ -1010,6 +1058,18 @@
       const selectedChar = document.querySelector('jrpg-portrait.selected');
       if (selectedChar) {
         selectedChar.setAttribute('hp', `${newHP}/${maxHP}`);
+      }
+
+      // Show toast for HP changes
+      if (amount > 0) {
+        showToast('success', `HP restored by ${amount}!`);
+      } else if (amount < 0) {
+        const damage = Math.abs(amount);
+        if (newHP <= maxHP * 0.25) {
+          showToast('warning', `Critical! ${damage} damage taken. HP critically low!`);
+        } else {
+          showToast('error', `${damage} damage taken!`);
+        }
       }
     }
 
@@ -1026,11 +1086,99 @@
       if (selectedChar) {
         selectedChar.setAttribute('mp', `${newMP}/${maxMP}`);
       }
+
+      // Show toast for MP changes
+      if (amount < 0) {
+        const used = Math.abs(amount);
+        showToast('info', `${used} MP used.`);
+      }
     }
 
-    // Initialize with sharp theme and select Cloud
-    applyTheme('sharp');
-    document.getElementById('cloud-portrait').click();
+    // Toast demo functionality
+    document.getElementById('show-success-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('success-toast');
+      toast.setAttribute('message', 'Quest completed! Experience gained.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-error-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('error-toast');
+      toast.setAttribute('message', 'Unable to equip item. Level requirement not met.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-warning-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('warning-toast');
+      toast.setAttribute('message', 'HP critically low! Consider using a potion.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-info-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('info-toast');
+      toast.setAttribute('message', 'New area discovered. Press START to continue.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-battle-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('battle-toast');
+      toast.setAttribute('message', 'Critical hit! 250 damage dealt.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-item-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('item-toast');
+      toast.setAttribute('message', 'Phoenix Down used. Character revived!');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    document.getElementById('show-quest-toast').addEventListener('jrpg-click', () => {
+      const toast = document.getElementById('quest-toast');
+      toast.setAttribute('message', 'New quest: "The Ancient Temple" - Speak to the village elder.');
+      toast.setAttribute('theme', currentTheme);
+      toast.show();
+    });
+
+    // Tooltip demo functionality
+    document.getElementById('show-item-tooltip').addEventListener('jrpg-click', (event) => {
+      JrpgTooltip.show(`
+        <h4>Potion of Healing</h4>
+        <p>Restores <strong>50 HP</strong> to the target character.</p>
+        <p><em>Common consumable item</em></p>
+      `, event.target, { theme: currentTheme, originalEvent: event.detail.originalEvent });
+    });
+
+    document.getElementById('show-stat-tooltip').addEventListener('jrpg-click', (event) => {
+      JrpgTooltip.show(`
+        <h4>Strength</h4>
+        <p>Determines physical attack power and carrying capacity.</p>
+        <p>Current: <strong>45</strong> (+5 from equipment)</p>
+        <p><em>Affects melee damage and item limits</em></p>
+      `, event.target, { theme: currentTheme, originalEvent: event.detail.originalEvent });
+    });
+
+    document.getElementById('show-quest-tooltip').addEventListener('jrpg-click', (event) => {
+      JrpgTooltip.show(`
+        <h4>The Ancient Temple</h4>
+        <p>Investigate the mysterious temple ruins in the northern mountains.</p>
+        <p>Rewards: <strong>Ancient Relic</strong>, 5000 EXP</p>
+        <p><em>Recommended Level: 40+</em></p>
+      `, event.target, { theme: currentTheme, originalEvent: event.detail.originalEvent });
+    });
+
+    document.getElementById('show-skill-tooltip').addEventListener('jrpg-click', (event) => {
+      JrpgTooltip.show(`
+        <h4>Fire Magic</h4>
+        <p>Deals fire damage to all enemies in a small area.</p>
+        <p>MP Cost: <strong>25</strong> | Power: <strong>120</strong></p>
+        <p><em>Elemental magic spell</em></p>
+      `, event.target, { theme: currentTheme, originalEvent: event.detail.originalEvent });
+    });
   </script>
 </body>
 </html>

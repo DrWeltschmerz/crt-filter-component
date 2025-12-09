@@ -87,6 +87,11 @@ class CRTOverlay extends HTMLElement {
       
       // Global opacity
       opacity: 1.0, // global opacity for entire overlay (0-1)
+      // Optional selector for a UI portal (e.g., tooltip/toast container). By
+      // default this is null to avoid modifying external elements. Set via
+      // the `portal-selector` attribute when you want the overlay to adjust
+      // that element for z-index/filtering purposes.
+      portalSelector: null,
     };
 
     // ===== INSTANCE STATE =====
@@ -916,8 +921,9 @@ class CRTOverlay extends HTMLElement {
       // Behind content mode: apply barrel only to background
       target = this.config.applyBarrelTo || '.bg-image';
     } else if (this.config.mode === 2) {
-      // On top mode: apply barrel to all content
-      target = this.config.applyBarrelTo || '> *:not(crt-overlay):not(.crt-controls-portal):not(.crt-external-bloom)';
+      // On top mode: apply barrel to all content except overlay's own elements and portal
+      // (portal excluded to prevent positioning issues with fixed elements)
+      target = this.config.applyBarrelTo || '> *:not(crt-overlay):not(.crt-controls-portal):not(.crt-external-bloom):not(.jrpg-portal)';
     } else {
       // Disabled mode: no barrel
       target = null;
