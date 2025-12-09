@@ -2,8 +2,6 @@
 
 A self-contained Web Component that renders authentic CRT monitor effects over any content. No dependencies, no shims, drop-in ready.
 
-![CRT Overlay Demo](assets/demo.jpg)
-
 ## Features
 
 **Core Effects**
