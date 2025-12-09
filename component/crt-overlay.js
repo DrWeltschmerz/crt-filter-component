@@ -28,7 +28,7 @@ class CRTOverlay extends HTMLElement {
       'barrel','scan-size','scan-density','phosphor-size','bloom','bloom-color','bloom-radius','bloom-decay','bloom-blur',
       'scanline-color','vignette-opacity','vignette-radius','vignette-feather','flicker-opacity','color-palette-shift','interlace-speed',
       'reflection-opacity','reflection-size','reflection-position-x','reflection-position-y',
-      'flicker','reflection','controls','mode','apply-barrel-to'
+      'flicker','reflection','controls','mode','apply-barrel-to','opacity'
     ];
   }
 
@@ -39,15 +39,15 @@ class CRTOverlay extends HTMLElement {
     // ===== CONFIGURATION OBJECT =====
     this.config = {
       // Scanlines & structure
-      scanOpacity: 0.85,
+      scanOpacity: 0.75,
       scanlineColor: 0, // 0-1, controls darkness of scanlines (0=black, 1=transparent)
-      hairlineOpacity: 0.18,
-      fringeOpacity: 0.25,
+      hairlineOpacity: 0.12,
+      fringeOpacity: 0.18,
       fringeDominant: 0.5, // 0=blue dominant, 1=red dominant, controls chromatic aberration tint
       fringeJitterSpeed: 3.2, // animation speed in seconds
       fringeJitterAmount: 2, // translation amount in px
-      noiseOpacity: 0.22,
-      barrel: 2,
+      noiseOpacity: 0.15,
+      barrel: 1.5,
       scanSize: 4,
       scanDensity: 2,
       phosphorSize: 1,
@@ -59,35 +59,34 @@ class CRTOverlay extends HTMLElement {
       // Bloom & glow effects
       bloom: 0.15,
       bloomColor: 'white', // 'white', 'amber', 'green', 'blue'
-      bloomRadius: 1400, // size of bloom glow in px
-      bloomDecay: 55, // falloff distance (0-100, %)
-      bloomBlur: 10, // blur amount for bloom effect (px)
-      bloomBrightness: 1.2, // brightness multiplier (0.5-2.0)
+      bloomRadius: 1200, // size of bloom glow in px
+      bloomDecay: 60, // falloff distance (0-100, %)
+      bloomBlur: 6, // blur amount for bloom effect (px)
+      bloomBrightness: 1.1, // brightness multiplier (0.5-2.0)
       
       // Color & visual effects
       colorPaletteShift: 0, // 0=none, positive=warm/amber, negative=cool/blue
-      vignetteOpacity: 0.5,
-      vignetteRadius: 85, // vignette ellipse size (%)
-      vignetteFeather: 40, // vignette feather distance (%)
-      vignetteColorLight: 0.35, // inner vignette opacity (0-1)
-      vignetteColorDark: 0.7, // outer vignette opacity (0-1)
-      reflectionOpacity: 0.03, // reflection glow opacity (0-1)
-      reflectionSize: 1400, // reflection ellipse size in px
+      vignetteOpacity: 0.4,
+      vignetteRadius: 80, // vignette ellipse size (%)
+      vignetteFeather: 35, // vignette feather distance (%)
+      vignetteColorLight: 0.3, // inner vignette opacity (0-1)
+      vignetteColorDark: 0.6, // outer vignette opacity (0-1)
+      reflectionOpacity: 0.02, // reflection glow opacity (0-1)
+      reflectionSize: 1200, // reflection ellipse size in px
       reflectionPositionX: 50, // horizontal position (0-100, %)
       reflectionPositionY: 10, // vertical position (0-100, %)
       reflection: false, // enable/disable reflection layer
       
       // Animation & behavior
-      flickerOpacity: 0.08,
+      flickerOpacity: 0.06,
       interlaceSpeed: 0.08, // 0.08 or 0.12 seconds per frame
       flicker: true,
       controls: false,
       mode: 1, // 0=disabled, 1=behind content (z-index:-1), 2=on top (z-index:9999)
       applyBarrelTo: null, // optional selector
       
-      // Legacy toggles (runtime switchers available in controls)
-      legacyInterlace: true,
-      legacyBloom: true
+      // Global opacity
+      opacity: 1.0, // global opacity for entire overlay (0-1)
     };
 
     // ===== INSTANCE STATE =====
@@ -152,7 +151,7 @@ class CRTOverlay extends HTMLElement {
     const map = {
       'scan-opacity':'scanOpacity','scanline-color':'scanlineColor','hairline-opacity':'hairlineOpacity','fringe-opacity':'fringeOpacity','fringe-dominant':'fringeDominant','fringe-jitter-speed':'fringeJitterSpeed','fringe-jitter-amount':'fringeJitterAmount','noise-opacity':'noiseOpacity',
       'barrel':'barrel','scan-size':'scanSize','scan-density':'scanDensity','phosphor-size':'phosphorSize','phosphor-opacity-red':'phosphorOpacityRed','phosphor-opacity-green':'phosphorOpacityGreen','phosphor-opacity-blue':'phosphorOpacityBlue','bloom':'bloom','bloom-color':'bloomColor','bloom-radius':'bloomRadius','bloom-decay':'bloomDecay','bloom-blur':'bloomBlur','bloom-brightness':'bloomBrightness','vignette-opacity':'vignetteOpacity','vignette-radius':'vignetteRadius','vignette-feather':'vignetteFeather','vignette-color-light':'vignetteColorLight','vignette-color-dark':'vignetteColorDark','reflection-opacity':'reflectionOpacity','reflection-size':'reflectionSize','reflection-position-x':'reflectionPositionX','reflection-position-y':'reflectionPositionY','scanline-mask':'scanlineMask','flicker-opacity':'flickerOpacity','color-palette-shift':'colorPaletteShift','interlace-speed':'interlaceSpeed',
-      'flicker':'flicker','reflection':'reflection','controls':'controls','mode':'mode','apply-barrel-to':'applyBarrelTo'
+      'flicker':'flicker','reflection':'reflection','controls':'controls','mode':'mode','apply-barrel-to':'applyBarrelTo','opacity':'opacity'
     };
     const key = map[name];
     if (!key) return;
@@ -185,7 +184,7 @@ class CRTOverlay extends HTMLElement {
     const template = `
       <style>
         :host{display:block;position:fixed;inset:0;pointer-events:none}
-        .crt-container{--scan-opacity:${this.config.scanOpacity};--scanline-color:${this.config.scanlineColor};--hairline-opacity:${this.config.hairlineOpacity};--fringe-opacity:${this.config.fringeOpacity};--fringe-dominant:${this.config.fringeDominant};--noise-opacity:${this.config.noiseOpacity};--scan-size:${this.config.scanSize}px;--scan-density:${this.config.scanDensity};--phosphor-size:${this.config.phosphorSize}px;--bloom-strength:${this.config.bloom};--bloom-radius:${this.config.bloomRadius}px;--bloom-decay:${this.config.bloomDecay}%;--vignette-opacity:${this.config.vignetteOpacity};--vignette-radius:${this.config.vignetteRadius}%;--vignette-feather:${this.config.vignetteFeather}%;--flicker-opacity:${this.config.flickerOpacity};--color-palette-shift:${this.config.colorPaletteShift}deg;--interlace-speed:${this.config.interlaceSpeed}s;position:absolute;inset:0;pointer-events:none;filter:hue-rotate(var(--color-palette-shift))}
+        .crt-container{--scan-opacity:${this.config.scanOpacity};--scanline-color:${this.config.scanlineColor};--hairline-opacity:${this.config.hairlineOpacity};--fringe-opacity:${this.config.fringeOpacity};--fringe-dominant:${this.config.fringeDominant};--noise-opacity:${this.config.noiseOpacity};--scan-size:${this.config.scanSize}px;--scan-density:${this.config.scanDensity};--phosphor-size:${this.config.phosphorSize}px;--bloom-strength:${this.config.bloom};--bloom-radius:${this.config.bloomRadius}px;--bloom-decay:${this.config.bloomDecay}%;--vignette-opacity:${this.config.vignetteOpacity};--vignette-radius:${this.config.vignetteRadius}%;--vignette-feather:${this.config.vignetteFeather}%;--flicker-opacity:${this.config.flickerOpacity};--color-palette-shift:${this.config.colorPaletteShift}deg;--interlace-speed:${this.config.interlaceSpeed}s;position:absolute;inset:0;pointer-events:none;filter:hue-rotate(var(--color-palette-shift));opacity:${this.config.opacity}}
         .crt-layer{position:absolute;inset:0;pointer-events:none}
         .crt-scanlines{z-index:1;mix-blend-mode:multiply;opacity:var(--scan-opacity);background-image:repeating-linear-gradient(to bottom,transparent 0px,transparent calc(var(--scan-size) - 1px),rgba(0,0,0,calc(0.65 * (1 - var(--scanline-color)))) calc(var(--scan-size) - 1px),rgba(0,0,0,calc(0.65 * (1 - var(--scanline-color)))) var(--scan-size));background-size:100% var(--scan-size);background-position:0 0}
         /* hairline interlace - supports legacy/crisper toggle */
@@ -494,7 +493,12 @@ class CRTOverlay extends HTMLElement {
             </select>
           </label>
         </details>
-      </details>
+
+        <!-- GLOBAL OPACITY SECTION -->
+        <details open style="padding:8px 0; margin:8px 0;">
+          <summary style="font-weight:600; color:#ffffff; margin-bottom:6px; cursor:pointer;">Global Opacity</summary>
+          ${this._controlRow('Overlay opacity','ctl-opacity','0','1','0.05',this.config.opacity,2)}
+        </details>
     `;
 
     document.body.appendChild(portal);
@@ -576,7 +580,8 @@ class CRTOverlay extends HTMLElement {
       'ctl-reflection-position-y': { prop: 'reflectionPositionY', attr: 'reflection-position-y' },
       'ctl-color-palette-shift': { prop: 'colorPaletteShift', attr: 'color-palette-shift' },
       'ctl-interlace-speed': { prop: 'interlaceSpeed', attr: 'interlace-speed' },
-      'ctl-flicker-opacity': { prop: 'flickerOpacity', attr: 'flicker-opacity' }
+      'ctl-flicker-opacity': { prop: 'flickerOpacity', attr: 'flicker-opacity' },
+      'ctl-opacity': { prop: 'opacity', attr: 'opacity' }
     };
 
     Object.entries(controls).forEach(([className, { prop, attr }]) => {
@@ -785,7 +790,8 @@ class CRTOverlay extends HTMLElement {
     container.style.setProperty('--color-palette-shift', `${this.config.colorPaletteShift}deg`);
     container.style.setProperty('--interlace-speed', `${this.config.interlaceSpeed}s`);
     container.style.setProperty('--flicker-opacity', this.config.flickerOpacity);
-    this.applyScanlineMask();
+    container.style.setProperty('--global-opacity', this.config.opacity);
+    container.style.opacity = this.config.opacity; // Apply global opacity to container
     this.updateModeZIndex();
     this.updateExternalBloomLayer(); this.applyGlobalFilters(); this.dispatchEvent(new CustomEvent('bloom-change',{detail:{bloom:this.config.bloom},bubbles:true,composed:true}));
   }
@@ -980,18 +986,20 @@ class CRTOverlay extends HTMLElement {
     this.updateModeZIndex(); // Ensure z-index is correct
     
     // Hide bloom layer completely when bloom is very low or disabled
-    if (b < 0.05) {
+    if (b < 0.01) {
       s.backdropFilter = 'none';
       s.webkitBackdropFilter = 'none';
+      s.opacity = this.config.opacity;
       return;
     }
     
-    // Apply bloom glow effect using only backdrop-filter blur + brightness
-    // Blur scales with bloom strength to avoid excessive blurring (0.15 bloom = ~0.5px blur)
-    const blurPx = this.config.bloomBlur * Math.max(0.15, b); // Scale blur with bloom strength (min 0.15x)
-    const bright = 1 + b * this.config.bloomBrightness * 0.4; // Reduce brightness impact
-    s.backdropFilter = `blur(${Math.min(blurPx, 1.5)}px) brightness(${bright})`;
+    // Apply bloom glow effect using backdrop-filter blur + brightness
+    // Blur scales with bloom strength (higher bloom = more blur)
+    const blurPx = Math.min(this.config.bloomBlur * b * 2, 20); // Scale blur with bloom, cap at 20px
+    const bright = 1 + b * this.config.bloomBrightness; // Brightness scales with bloom
+    s.backdropFilter = `blur(${blurPx}px) brightness(${bright})`;
     s.webkitBackdropFilter = s.backdropFilter;
+    s.opacity = this.config.opacity; // Apply global opacity to bloom layer too
   }
 
 

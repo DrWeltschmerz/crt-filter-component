@@ -21,6 +21,19 @@ A self-contained Web Component that renders authentic CRT monitor effects over a
 - **Z-Index Modes** - Behind content, on top, or disabled
 - **Framework Agnostic** - Works in vanilla JS, React, Vue, Angular, etc.
 
+## JRPG Components
+
+A collection of Web Components inspired by classic JRPGs (Final Fantasy VII/IX, PS2 era games) that work seamlessly with the CRT overlay:
+
+- **`<jrpg-dialog>`** - Ornate dialog boxes with speaker names and gradient backgrounds
+- **`<jrpg-menu>`** - Grid-based menu windows for options, stats, and inventory
+- **`<jrpg-portrait>`** - Character portrait frames with level badges and HP/MP stats
+- **`<jrpg-button>`** - Embossed buttons with hover effects and ripple animations
+
+All components feature authentic JRPG styling with corner decorations, gradient backgrounds, and customizable colors. Perfect for retro-styled games and interfaces.
+
+**Demo**: [JRPG Components Demo](https://drweltschmerz.github.io/crt-filter-component/demo/jrpg-demo.html)
+
 ## Quick Start
 
 ### Installation

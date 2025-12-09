@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JRPG Components Demo - CRT Overlay</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, #0a0a0a, #1a1a2a);
+      color: #e6f7ff;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+    }
+
+    .demo-header h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      color: #4aa3e1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .demo-header p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .demo-section {
+      margin-bottom: 60px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ffd700;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .section-description {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    /* Dialog demo */
+    .dialog-demo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+
+    /* Menu demo */
+    .menu-demo {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Portrait demo */
+    .portrait-demo {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Progress demo */
+    .progress-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* Input demo */
+    .input-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .input-row {
+      width: 100%;
+      text-align: left;
+    }
+
+    .progress-row {
+      width: 100%;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .button-label {
+      min-width: 80px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    /* Interactive demo */
+    .interactive-demo {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .character-select {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .action-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .dialog-area {
+      min-height: 150px;
+    }
+
+    /* CRT Controls hint */
+    .crt-hint {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #ffd700;
+      border-radius: 8px;
+      padding: 15px;
+      font-size: 0.9rem;
+      color: #ffffff;
+      max-width: 250px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .crt-hint strong {
+      color: #ffd700;
+    }
+
+    @media (max-width: 768px) {
+      .interactive-demo {
+        grid-template-columns: 1fr;
+      }
+
+      .crt-hint {
+        position: static;
+        margin: 20px auto;
+        max-width: none;
+      }
+    }
+
+    /* Navigation styles */
+    .nav-links {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-links a {
+      color: #4aa3e1;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(74, 163, 225, 0.1);
+      color: #6bb8e6;
+    }
+
+    /* Theme selector */
+    .theme-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .theme-btn {
+      min-width: 120px;
+    }
+
+    /* Component grid for cards */
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation links -->
+  <div class="nav-links">
+    <a href="original-crt-demo.html">Main</a>
+    <a href="crt-demo.html">Playground</a>
+    <a href="scoped-crt-demo.html">Scoped Barrel</a>
+    <a href="z-index-test.html">Z-Index Test</a>
+    <a href="jrpg-demo.html" class="active">JRPG Components</a>
+  </div>
+
+  <!-- Demo Header -->
+  <header class="demo-header">
+    <h1>JRPG Components</h1>
+    <p>Classic JRPG-inspired UI components built as Web Components. Perfect for retro-styled games, menus, and interfaces. All components work seamlessly with the CRT overlay effects.</p>
+  </header>
+
+  <!-- Theme Selector -->
+  <section class="demo-section">
+    <h2 class="section-title">Theme Selector</h2>
+    <p class="section-description">
+      Choose from different JRPG game-inspired themes to see how the components adapt to various visual styles.
+    </p>
+
+    <div class="theme-selector">
+      <div class="theme-buttons">
+        <jrpg-button id="theme-sharp" class="theme-btn" active>Sharp</jrpg-button>
+        <jrpg-button id="theme-elegant" class="theme-btn">Elegant</jrpg-button>
+        <jrpg-button id="theme-mystical" class="theme-btn">Mystical</jrpg-button>
+        <jrpg-button id="theme-minimal" class="theme-btn">Minimal</jrpg-button>
+        <jrpg-button id="theme-vintage" class="theme-btn">Vintage</jrpg-button>
+        <jrpg-button id="theme-playful" class="theme-btn">Playful</jrpg-button>
+        <jrpg-button id="theme-retro" class="theme-btn">Retro</jrpg-button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dialog Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Dialog Boxes</h2>
+    <p class="section-description">
+      Ornate dialog boxes with speaker names, perfect for NPC conversations and story text.
+      Features gradient backgrounds, corner decorations, and customizable colors.
+    </p>
+
+    <div class="dialog-demo">
+      <jrpg-dialog
+        speaker="Cloud Strife"
+        text="I'm not fit to carry the weight of the planet on my shoulders. But I can hold my friends up. That's good enough for me."
+        width="500px">
+      </jrpg-dialog>
+    </div>
+  </section>
+
+  <!-- Menu Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Menu Windows</h2>
+    <p class="section-description">
+      Grid-based menu windows for displaying options, stats, or inventory items.
+      Supports multiple columns and custom styling.
+    </p>
+
+    <div class="menu-demo">
+      <jrpg-menu title="Main Menu" columns="1" width="250px">
+        <div slot="item">Continue</div>
+        <div slot="item">New Game</div>
+        <div slot="item">Load Game</div>
+        <div slot="item">Settings</div>
+        <div slot="item">Quit</div>
+      </jrpg-menu>
+
+      <jrpg-menu title="Magic" columns="2" width="300px">
+        <div slot="item">Fire</div>
+        <div slot="item">Blizzard</div>
+        <div slot="item">Thunder</div>
+        <div slot="item">Cure</div>
+        <div slot="item">Aero</div>
+        <div slot="item">Bio</div>
+      </jrpg-menu>
+    </div>
+  </section>
+
+  <!-- Portrait Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Character Portraits</h2>
+    <p class="section-description">
+      Character portrait frames with level badges, HP/MP stats, and selection indicators.
+      Perfect for party selection screens and character menus.
+    </p>
+
+    <div class="portrait-demo">
+      <jrpg-portrait
+        name="Cloud"
+        level="45"
+        hp="1250/1250"
+        mp="180/200"
+        size="140px">
+      </jrpg-portrait>
+
+      <jrpg-portrait
+        name="Tifa"
+        level="42"
+        hp="1100/1150"
+        mp="220/250"
+        size="140px">
+      </jrpg-portrait>
+
+      <jrpg-portrait
+        name="Barret"
+        level="44"
+        hp="1350/1400"
+        mp="150/180"
+        size="140px">
+      </jrpg-portrait>
+    </div>
+  </section>
+
+  <!-- Button Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Interactive Buttons</h2>
+    <p class="section-description">
+      Embossed buttons with hover effects, ripple animations, and multiple variants.
+      Includes pressed states and accessibility features.
+    </p>
+
+    <div class="button-demo">
+      <div class="button-row">
+        <span class="button-label">Primary:</span>
+        <jrpg-button>Attack</jrpg-button>
+        <jrpg-button variant="secondary">Defend</jrpg-button>
+        <jrpg-button variant="danger">Limit Break</jrpg-button>
+      </div>
+
+      <div class="button-row">
+        <span class="button-label">Sizes:</span>
+        <jrpg-button size="small">Small</jrpg-button>
+        <jrpg-button size="medium">Medium</jrpg-button>
+        <jrpg-button size="large">Large</jrpg-button>
+      </div>
+
+      <div class="button-row">
+        <span class="button-label">Disabled:</span>
+        <jrpg-button disabled>Can't Use</jrpg-button>
+        <jrpg-button variant="secondary" disabled>Locked</jrpg-button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Progress Bars</h2>
+    <p class="section-description">
+      Animated progress bars with theme-aware styling. Perfect for health/mana bars, experience points, or loading indicators.
+      Includes critical health warnings and smooth animations.
+    </p>
+
+    <div class="progress-demo">
+      <div class="progress-row">
+        <jrpg-progress value="850" max="1000" label="HP" animated></jrpg-progress>
+      </div>
+      <div class="progress-row">
+        <jrpg-progress value="45" max="100" label="MP"></jrpg-progress>
+      </div>
+      <div class="progress-row">
+        <jrpg-progress value="15" max="100" label="Critical HP" animated></jrpg-progress>
+      </div>
+      <div class="progress-row">
+        <jrpg-progress value="75" max="100" label="Experience" size="large"></jrpg-progress>
+      </div>
+    </div>
+  </section>
+
+  <!-- Input Component Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">Input Fields</h2>
+    <p class="section-description">
+      JRPG-styled input fields with focus effects and theme-aware colors. Perfect for character naming, password entry, or any text input.
+      Features animated borders and retro styling.
+    </p>
+
+    <div class="input-demo">
+      <div class="input-row">
+        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Character Name:</label>
+        <jrpg-input placeholder="Enter your name" width="250px"></jrpg-input>
+      </div>
+
+      <div class="input-row">
+        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Password:</label>
+        <jrpg-input type="password" placeholder="Enter password" width="250px"></jrpg-input>
+      </div>
+
+      <div class="input-row">
+        <label style="display: block; margin-bottom: 5px; color: #ffd700;">Email:</label>
+        <jrpg-input type="email" placeholder="your@email.com" width="250px"></jrpg-input>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo -->
+  <section class="demo-section">
+    <h2 class="section-title">JRPG Card Component</h2>
+    <p class="section-description">
+      Content cards with ornate borders and hover effects. Perfect for displaying information, stats, or notifications.
+    </p>
+
+    <div class="component-grid">
+      <jrpg-card title="Character Info" width="280px">
+        <p><strong>Name:</strong> Cloud Strife</p>
+        <p><strong>Level:</strong> 45</p>
+        <p><strong>Class:</strong> SOLDIER</p>
+        <p><strong>HP:</strong> 1250/1250</p>
+      </jrpg-card>
+
+      <jrpg-card title="Equipment" width="280px">
+        <p><strong>Weapon:</strong> Buster Sword</p>
+        <p><strong>Armor:</strong> SOLDIER Uniform</p>
+        <p><strong>Accessory:</strong> Mythril Armlet</p>
+      </jrpg-card>
+
+      <jrpg-card title="Magic" width="280px">
+        <div slot="footer-content">Click to cast</div>
+        <p><strong>Fire:</strong> Level 3</p>
+        <p><strong>Thunder:</strong> Level 2</p>
+        <p><strong>Barrier:</strong> Level 1</p>
+      </jrpg-card>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h2 class="section-title">Interactive Demo</h2>
+    <p class="section-description">
+      A complete JRPG-style interface combining all components. Select characters and see the dialog change!
+    </p>
+
+    <div class="interactive-demo">
+      <div class="character-select">
+        <h3 style="color: #ffd700; margin-bottom: 15px; text-align: center;">Select Character</h3>
+        <div class="character-grid">
+          <jrpg-portrait
+            id="cloud-portrait"
+            name="Cloud"
+            level="45"
+            hp="1250/1250"
+            mp="180/200"
+            size="140px">
+          </jrpg-portrait>
+
+          <jrpg-portrait
+            id="tifa-portrait"
+            name="Tifa"
+            level="42"
+            hp="1100/1150"
+            mp="220/250"
+            size="140px">
+          </jrpg-portrait>
+
+          <jrpg-portrait
+            id="barret-portrait"
+            name="Barret"
+            level="44"
+            hp="1350/1400"
+            mp="150/180"
+            size="140px">
+          </jrpg-portrait>
+        </div>
+      </div>
+
+      <div class="action-panel">
+        <jrpg-menu id="action-menu" title="Actions" columns="1" width="250px">
+          <div slot="item">Talk</div>
+          <div slot="item">Check</div>
+          <div slot="item">Magic</div>
+          <div slot="item">Items</div>
+        </jrpg-menu>
+
+        <jrpg-card id="character-info-card" title="Character Info" width="250px">
+          <p><strong>Name:</strong> <span id="char-name">Cloud Strife</span></p>
+          <div style="margin: 10px 0;">
+            <jrpg-input id="name-input" placeholder="Rename character" width="200px" style="display: none;"></jrpg-input>
+          </div>
+          <p><strong>Level:</strong> <span id="char-level">45</span></p>
+          <div style="margin: 25px 0;">
+            <jrpg-progress id="char-hp-bar" value="1250" max="1250" label="HP" size="small"></jrpg-progress>
+          </div>
+          <div style="margin: 25px 0;">
+            <jrpg-progress id="char-mp-bar" value="180" max="200" label="MP" size="small"></jrpg-progress>
+          </div>
+          <div style="margin-top: 15px;">
+            <jrpg-button id="rename-btn" size="small">Rename</jrpg-button>
+          </div>
+        </jrpg-card>
+
+        <div class="dialog-area">
+          <jrpg-dialog
+            id="dialog-box"
+            speaker="Cloud Strife"
+            text="I'm Cloud. Got it memorized?"
+            width="280px">
+          </jrpg-dialog>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRT Overlay Component -->
+  <crt-overlay
+    z-index="1"
+    scan-opacity="0.8"
+    hairline-opacity="0.15"
+    fringe-opacity="0.2"
+    noise-opacity="0.15"
+    barrel="1.5"
+    scan-size="3"
+    scan-density="2"
+    phosphor-size="1"
+    bloom="0.1"
+    flicker
+    controls
+  ></crt-overlay>
+
+  <!-- Load Components -->
+  <script type="module">
+    import '../component/crt-overlay.js';
+    import '../component/jrpg-dialog.js';
+    import '../component/jrpg-menu.js';
+    import '../component/jrpg-portrait.js';
+    import '../component/jrpg-button.js';
+    import '../component/jrpg-card.js';
+    import '../component/jrpg-progress.js';
+    import '../component/jrpg-input.js';
+  </script>
+
+  <!-- Interactive Demo Logic -->
+  <script>
+    // Theme definitions
+    const themes = {
+      'sharp': {
+        name: 'Sharp',
+        dialog: { primary: '#2a4a7a', secondary: '#1a2a4a', accent: '#ffd700' },
+        menu: { primary: '#4a2a1a', secondary: '#2a1a0a', accent: '#daa520' },
+        portrait: { frame: '#8b4513', accent: '#ffd700' },
+        button: { primary: '#4a4a8a', secondary: '#2a2a5a', accent: '#ffd700' },
+        progress: { primary: '#4a4a8a', secondary: '#2a2a5a', accent: '#ffd700' },
+        card: { primary: '#2a4a7a', secondary: '#1a2a4a', accent: '#ffd700' },
+        input: { primary: '#4a4a8a', secondary: '#2a2a5a', accent: '#ffd700' }
+      },
+      'elegant': {
+        name: 'Elegant',
+        dialog: { primary: '#4a6a2a', secondary: '#2a4a1a', accent: '#90ee90' },
+        menu: { primary: '#2a4a4a', secondary: '#1a2a2a', accent: '#48d1cc' },
+        portrait: { frame: '#654321', accent: '#90ee90' },
+        button: { primary: '#4a6a2a', secondary: '#2a4a1a', accent: '#90ee90' },
+        progress: { primary: '#4a6a2a', secondary: '#2a4a1a', accent: '#90ee90' },
+        card: { primary: '#4a6a2a', secondary: '#2a4a1a', accent: '#90ee90' },
+        input: { primary: '#4a6a2a', secondary: '#2a4a1a', accent: '#90ee90' }
+      },
+      'mystical': {
+        name: 'Mystical',
+        dialog: { primary: '#6a4a2a', secondary: '#4a2a1a', accent: '#ff8c00' },
+        menu: { primary: '#4a4a1a', secondary: '#2a2a0a', accent: '#daa520' },
+        portrait: { frame: '#8b4513', accent: '#ff8c00' },
+        button: { primary: '#6a4a2a', secondary: '#4a2a1a', accent: '#ff8c00' },
+        progress: { primary: '#6a4a2a', secondary: '#4a2a1a', accent: '#ff8c00' },
+        card: { primary: '#6a4a2a', secondary: '#4a2a1a', accent: '#ff8c00' },
+        input: { primary: '#6a4a2a', secondary: '#4a2a1a', accent: '#ff8c00' }
+      },
+      'minimal': {
+        name: 'Minimal',
+        dialog: { primary: '#4a2a4a', secondary: '#2a1a2a', accent: '#dda0dd' },
+        menu: { primary: '#2a2a4a', secondary: '#1a1a2a', accent: '#ba55d3' },
+        portrait: { frame: '#4b0082', accent: '#dda0dd' },
+        button: { primary: '#4a2a4a', secondary: '#2a1a2a', accent: '#dda0dd' },
+        progress: { primary: '#4a2a4a', secondary: '#2a1a2a', accent: '#dda0dd' },
+        card: { primary: '#4a2a4a', secondary: '#2a1a2a', accent: '#dda0dd' },
+        input: { primary: '#4a2a4a', secondary: '#2a1a2a', accent: '#dda0dd' }
+      },
+      'vintage': {
+        name: 'Vintage',
+        dialog: { primary: '#2a4a6a', secondary: '#1a2a4a', accent: '#00ced1' },
+        menu: { primary: '#4a4a6a', secondary: '#2a2a4a', accent: '#4682b4' },
+        portrait: { frame: '#2f4f4f', accent: '#00ced1' },
+        button: { primary: '#2a4a6a', secondary: '#1a2a4a', accent: '#00ced1' },
+        progress: { primary: '#2a4a6a', secondary: '#1a2a4a', accent: '#00ced1' },
+        card: { primary: '#2a4a6a', secondary: '#1a2a4a', accent: '#00ced1' },
+        input: { primary: '#2a4a6a', secondary: '#1a2a4a', accent: '#00ced1' }
+      },
+      'playful': {
+        name: 'Playful',
+        dialog: { primary: '#6a4a8a', secondary: '#4a2a6a', accent: '#ff69b4' },
+        menu: { primary: '#4a2a6a', secondary: '#2a1a4a', accent: '#da70d6' },
+        portrait: { frame: '#8a2be2', accent: '#ff69b4' },
+        button: { primary: '#6a4a8a', secondary: '#4a2a6a', accent: '#ff69b4' },
+        progress: { primary: '#6a4a8a', secondary: '#4a2a6a', accent: '#ff69b4' },
+        card: { primary: '#6a4a8a', secondary: '#4a2a6a', accent: '#ff69b4' },
+        input: { primary: '#6a4a8a', secondary: '#4a2a6a', accent: '#ff69b4' }
+      },
+      'retro': {
+        name: 'Retro',
+        dialog: { primary: '#000000', secondary: '#000000', accent: '#00FF00' },
+        menu: { primary: '#001100', secondary: '#000000', accent: '#FFFF00' },
+        portrait: { frame: '#000000', accent: '#00FF00' },
+        button: { primary: '#000000', secondary: '#000000', accent: '#00FF00' },
+        card: { primary: '#000000', secondary: '#000000', accent: '#00FF00' },
+        progress: { primary: '#000000', secondary: '#000000', accent: '#00FF00' },
+        input: { primary: '#000000', secondary: '#000000', accent: '#00FF00' }
+      }
+    };
+
+    // Current theme
+    let currentTheme = 'sharp';
+
+    // Apply theme to all components
+    function applyTheme(themeKey) {
+      const theme = themes[themeKey];
+      currentTheme = themeKey;
+
+      // Update dialog
+      const dialogs = document.querySelectorAll('jrpg-dialog');
+      dialogs.forEach(dialog => {
+        dialog.setAttribute('theme', themeKey);
+        dialog.setAttribute('primary-color', theme.dialog.primary);
+        dialog.setAttribute('secondary-color', theme.dialog.secondary);
+        dialog.setAttribute('accent-color', theme.dialog.accent);
+      });
+
+      // Update menus
+      const menus = document.querySelectorAll('jrpg-menu');
+      menus.forEach(menu => {
+        menu.setAttribute('theme', themeKey);
+        menu.setAttribute('primary-color', theme.menu.primary);
+        menu.setAttribute('secondary-color', theme.menu.secondary);
+        menu.setAttribute('accent-color', theme.menu.accent);
+      });
+
+      // Update portraits
+      const portraits = document.querySelectorAll('jrpg-portrait');
+      portraits.forEach((portrait, index) => {
+        portrait.setAttribute('theme', themeKey);
+        const colors = [
+          { frame: theme.portrait.frame, accent: theme.portrait.accent },
+          { frame: '#4a4a8a', accent: '#ff69b4' },
+          { frame: '#8a4a4a', accent: '#ff6b6b' }
+        ];
+        const colorSet = colors[index % colors.length];
+        portrait.setAttribute('frame-color', colorSet.frame);
+        portrait.setAttribute('accent-color', colorSet.accent);
+      });
+
+      // Update cards
+      const cards = document.querySelectorAll('jrpg-card');
+      cards.forEach(card => {
+        card.setAttribute('theme', themeKey);
+        card.setAttribute('primary-color', theme.card?.primary || theme.dialog.primary);
+        card.setAttribute('secondary-color', theme.card?.secondary || theme.dialog.secondary);
+        card.setAttribute('accent-color', theme.card?.accent || theme.dialog.accent);
+      });
+
+      // Update buttons (excluding theme selector buttons)
+      const buttons = document.querySelectorAll('jrpg-button:not(.theme-btn)');
+      buttons.forEach(btn => {
+        btn.setAttribute('theme', themeKey);
+        btn.setAttribute('primary-color', theme.button.primary);
+        btn.setAttribute('secondary-color', theme.button.secondary);
+        btn.setAttribute('accent-color', theme.button.accent);
+      });
+
+      // Update progress bars
+      const progressBars = document.querySelectorAll('jrpg-progress');
+      progressBars.forEach(progress => {
+        progress.setAttribute('theme', themeKey);
+        progress.setAttribute('primary-color', theme.progress.primary);
+        progress.setAttribute('secondary-color', theme.progress.secondary);
+        progress.setAttribute('accent-color', theme.progress.accent);
+      });
+
+      // Update input fields
+      const inputs = document.querySelectorAll('jrpg-input');
+      inputs.forEach(input => {
+        input.setAttribute('theme', themeKey);
+        input.setAttribute('primary-color', theme.input.primary);
+        input.setAttribute('secondary-color', theme.input.secondary);
+        input.setAttribute('accent-color', theme.input.accent);
+      });
+
+      // Update theme button states
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        const btnThemeKey = btn.id.replace('theme-', '');
+        const btnTheme = themes[btnThemeKey];
+        btn.setAttribute('theme', btnThemeKey);
+        btn.setAttribute('primary-color', btnTheme.button.primary);
+        btn.setAttribute('secondary-color', btnTheme.button.secondary);
+        btn.setAttribute('accent-color', btnTheme.button.accent);
+        btn.removeAttribute('active');
+      });
+      document.getElementById(`theme-${themeKey}`).setAttribute('active', '');
+    }
+
+    // Theme selector event listeners
+    Object.keys(themes).forEach(themeKey => {
+      document.getElementById(`theme-${themeKey}`).addEventListener('jrpg-click', () => {
+        applyTheme(themeKey);
+      });
+    });
+
+    // Character data
+    const characters = {
+      cloud: {
+        name: "Cloud Strife",
+        dialog: "I'm not fit to carry the weight of the planet on my shoulders. But I can hold my friends up. That's good enough for me.",
+        color: "#2a4a7a"
+      },
+      tifa: {
+        name: "Tifa Lockhart",
+        dialog: "Don't worry about me. I'm tougher than I look. Just promise me you'll come back alive.",
+        color: "#4a4a8a"
+      },
+      barret: {
+        name: "Barret Wallace",
+        dialog: "This world's full of hurtin' people. And they're all lookin' for someone to blame. But not me.",
+        color: "#8a4a4a"
+      }
+    };
+
+    // Character selection
+    document.querySelectorAll('jrpg-portrait').forEach(portrait => {
+      portrait.addEventListener('click', () => {
+        // Remove selected class from all portraits
+        document.querySelectorAll('jrpg-portrait').forEach(p => p.classList.remove('selected'));
+        // Add selected class to clicked portrait
+        portrait.classList.add('selected');
+
+        // Update dialog
+        const charId = portrait.id.replace('-portrait', '');
+        const character = characters[charId];
+        if (character) {
+          const dialog = document.getElementById('dialog-box');
+          dialog.setAttribute('speaker', character.name);
+          dialog.setAttribute('text', character.dialog);
+          dialog.setAttribute('theme', currentTheme);
+          dialog.setAttribute('primary-color', themes[currentTheme].dialog.primary);
+
+          // Update character info card
+          document.getElementById('char-name').textContent = character.name;
+          const level = portrait.getAttribute('level') || '1';
+          const hpText = portrait.getAttribute('hp') || '100/100';
+          const mpText = portrait.getAttribute('mp') || '50/50';
+          
+          // Parse HP and MP values
+          const [currentHp, maxHp] = hpText.split('/').map(Number);
+          const [currentMp, maxMp] = mpText.split('/').map(Number);
+          
+          document.getElementById('char-level').textContent = level;
+          
+          // Update progress bars
+          const hpBar = document.getElementById('char-hp-bar');
+          const mpBar = document.getElementById('char-mp-bar');
+          hpBar.setAttribute('value', currentHp);
+          hpBar.setAttribute('max', maxHp);
+          mpBar.setAttribute('value', currentMp);
+          mpBar.setAttribute('max', maxMp);
+        }
+      });
+    });
+
+    // Menu interaction
+    document.getElementById('action-menu').addEventListener('menu-select', (event) => {
+      const actions = ['talk', 'check', 'magic', 'items'];
+      const action = actions[event.detail.index];
+      const selectedChar = document.querySelector('jrpg-portrait.selected');
+
+      if (selectedChar) {
+        const charId = selectedChar.id.replace('-portrait', '');
+        const character = characters[charId];
+
+        let response = "";
+        switch(action) {
+          case 'talk':
+            response = `You talk to ${character.name}. They seem deep in thought.`;
+            break;
+          case 'check':
+            response = `${character.name} appears to be a skilled fighter with high combat abilities.`;
+            break;
+          case 'magic':
+            response = `${character.name} has access to powerful magic abilities.`;
+            break;
+          case 'items':
+            response = `${character.name} is carrying various items and equipment.`;
+            break;
+        }
+
+        const dialog = document.getElementById('dialog-box');
+        dialog.setAttribute('speaker', 'Narrator');
+        dialog.setAttribute('text', response);
+        dialog.setAttribute('theme', currentTheme);
+        dialog.setAttribute('primary-color', themes[currentTheme].dialog.primary);
+      }
+    });
+
+    // Rename functionality
+    const renameBtn = document.getElementById('rename-btn');
+    const nameInput = document.getElementById('name-input');
+    const charNameSpan = document.getElementById('char-name');
+
+    renameBtn.addEventListener('jrpg-click', () => {
+      if (nameInput.style.display === 'none') {
+        // Show input field
+        nameInput.style.display = 'block';
+        nameInput.value = charNameSpan.textContent;
+        nameInput.focus();
+        renameBtn.textContent = 'Save';
+      } else {
+        // Save new name
+        const newName = nameInput.value.trim();
+        if (newName) {
+          charNameSpan.textContent = newName;
+          // Update dialog speaker if this character is selected
+          const selectedChar = document.querySelector('jrpg-portrait.selected');
+          if (selectedChar) {
+            const dialog = document.getElementById('dialog-box');
+            dialog.setAttribute('speaker', newName);
+          }
+        }
+        nameInput.style.display = 'none';
+        renameBtn.textContent = 'Rename';
+      }
+    });
+
+    // Handle Enter key in input
+    nameInput.addEventListener('jrpg-change', (e) => {
+      if (e.detail.value.trim()) {
+        charNameSpan.textContent = e.detail.value.trim();
+        const selectedChar = document.querySelector('jrpg-portrait.selected');
+        if (selectedChar) {
+          const dialog = document.getElementById('dialog-box');
+          dialog.setAttribute('speaker', e.detail.value.trim());
+        }
+        nameInput.style.display = 'none';
+        renameBtn.textContent = 'Rename';
+      }
+    });
+
+    // Initialize with sharp theme and select Cloud
+    applyTheme('sharp');
+    document.getElementById('cloud-portrait').click();
+  </script>
+</body>
+</html>
