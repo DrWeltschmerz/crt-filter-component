@@ -24,10 +24,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Copy assets and component to demo
+      - name: Prepare demo for deployment
         run: |
           cp -r assets demo/
           cp -r component demo/
+          find demo -name "*.html" -type f -exec sed -i "s|'../assets/|'assets/|g" {} +
+          find demo -name "*.html" -type f -exec sed -i 's|"../assets/|"assets/|g' {} +
+          find demo -name "*.html" -type f -exec sed -i "s|'../component/|'component/|g" {} +
+          find demo -name "*.html" -type f -exec sed -i 's|"../component/|"component/|g' {} +
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
