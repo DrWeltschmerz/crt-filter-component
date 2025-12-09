@@ -24,6 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Copy assets and component to demo
+        run: |
+          cp -r assets demo/
+          cp -r component demo/
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       

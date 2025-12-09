@@ -18,7 +18,7 @@
     .demo-wrapper::-webkit-scrollbar { width: 8px; }
     .demo-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
     .demo-wrapper::-webkit-scrollbar-thumb { background-color: #ff8a1f; border-radius: 4px; }
-    .bg-image { position: fixed; inset: 0; background: url('../assets/city.jpg') center bottom / cover no-repeat; opacity: 0.75; z-index: -10; filter: saturate(1.1); }
+    .bg-image { position: fixed; inset: 0; background: url('assets/city.jpg') center bottom / cover no-repeat; opacity: 0.75; z-index: -10; filter: saturate(1.1); }
     .hero { min-height: 30vh; display: grid; place-items: center; text-align: center; padding: 3rem 1.5rem 1.5rem; }
     .hero h1 { font-size: clamp(2.8rem, 6vw, 5.4rem); font-weight: 900; letter-spacing: -0.02em; margin-bottom: 1rem; background: linear-gradient(135deg, #4aa3e1, #ff8a1f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .hero p { max-width: 720px; margin: 0 auto 1.5rem; color: rgba(230,247,255,0.85); line-height: 1.7; }
@@ -213,7 +213,7 @@ mode="2"  // On top (z-index: 9999)</div>
 
   <script type="module">
     // import the new isolated component for testing
-    import '../component/crt-overlay.js';
+    import 'component/crt-overlay.js';
 
     // Ensure custom element is defined before use
     customElements.whenDefined('crt-overlay');
