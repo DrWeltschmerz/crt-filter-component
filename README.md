@@ -6,7 +6,7 @@ A self-contained Web Component that renders authentic CRT monitor effects over a
 
 ## Features
 
-✨ **Core Effects**
+**Core Effects**
 - **Scanlines** - Shadow-mask scanlines with animated hairlines and phosphor triads (RGB)
 - **Chromatic Aberration** - Color fringing with jitter animation
 - **Bloom/Halation** - Screen glow with scaling blur effect
@@ -15,7 +15,7 @@ A self-contained Web Component that renders authentic CRT monitor effects over a
 - **Film Grain** - Noise pool with configurable opacity
 - **Flicker** - Random scanline flicker animation
 
-✨ **Technical**
+**Technical**
 - **Barrel Distortion** - SVG-based lens curvature (optional scoped selector)
 - **Scanline Masks** - 5 different mask types (shadow-mask, aperture-grille, slot-mask, sharp, soft)
 - **21 Presets** - CRT, arcade, terminal, plasma, broadcast, professional, and phosphor variants
@@ -391,7 +391,3 @@ Requires:
 ## License
 
 MIT – Use freely in personal and commercial projects.
-
----
-
-**Built with ❤️ for retro enthusiasts and CRT lovers**
