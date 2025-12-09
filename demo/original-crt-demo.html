@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRT Overlay Web Component - Demo (original layout, new component)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, #05070a, #071426);
+      color: #e6f7ff;
+      overflow-x: hidden;
+    }
+    .demo-wrapper { position: fixed; inset: 0; overflow-y: auto; overflow-x: hidden; }
+    .demo-wrapper::-webkit-scrollbar { width: 8px; }
+    .demo-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    .demo-wrapper::-webkit-scrollbar-thumb { background-color: #ff8a1f; border-radius: 4px; }
+    .bg-image { position: fixed; inset: 0; background: url('../assets/city.jpg') center bottom / cover no-repeat; opacity: 0.75; z-index: -10; filter: saturate(1.1); }
+    .hero { min-height: 30vh; display: grid; place-items: center; text-align: center; padding: 3rem 1.5rem 1.5rem; }
+    .hero h1 { font-size: clamp(2.8rem, 6vw, 5.4rem); font-weight: 900; letter-spacing: -0.02em; margin-bottom: 1rem; background: linear-gradient(135deg, #4aa3e1, #ff8a1f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { max-width: 720px; margin: 0 auto 1.5rem; color: rgba(230,247,255,0.85); line-height: 1.7; }
+    .cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .btn { padding: 0.75rem 1.25rem; border-radius: 10px; text-decoration: none; font-weight: 700; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.65); color: #4aa3e1; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(74,163,225,0.18); border-color: rgba(74,163,225,0.5); }
+    .btn.secondary { color: #ffb35c; border-color: rgba(255,138,31,0.35); box-shadow: 0 6px 24px rgba(255,138,31,0.16); }
+    .terminal-grid { display: grid; gap: 1.25rem; padding: 0 1.25rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .terminal { background: linear-gradient(180deg, rgba(3,6,14,0.8), rgba(5,12,26,0.7)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.45); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .terminal-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: linear-gradient(90deg, rgba(255,138,31,0.2), rgba(74,163,225,0.18)); border-bottom: 1px solid rgba(255,255,255,0.08); font-family: 'Share Tech Mono', monospace; letter-spacing: 0.02em; font-size: 0.95rem; color: #e6f7ff; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #ff8a1f; box-shadow: 16px 0 0 #ffd166, 32px 0 0 #4aa3e1; opacity: 0.85; }
+    .terminal-body { padding: 16px 18px 18px; color: rgba(230,247,255,0.9); font-size: 0.98rem; line-height: 1.65; }
+    .terminal h3 { margin: 0 0 10px; color: #ffb35c; font-size: 1rem; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+    .terminal ul { list-style: none; padding-left: 0; margin: 0; }
+    .terminal li { padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+    .terminal li:last-child { border-bottom: none; }
+    .code-block { font-family: 'Share Tech Mono', monospace; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin: 10px 0; color: #9be3ff; }
+    .muted { color: rgba(230,247,255,0.7); font-size: 0.95rem; }
+    .link-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 10px; }
+    .link-row a { font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; }
+    .nav-links {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(74, 163, 225, 0.15);
+      border: 1px solid rgba(74, 163, 225, 0.3);
+      text-decoration: none;
+      color: #e6f7ff;
+      transition: all 0.2s ease;
+    }
+    .nav-links a:hover {
+      background: rgba(74, 163, 225, 0.3);
+      border-color: rgba(74, 163, 225, 0.6);
+    }
+    .nav-links a.active {
+      background: rgba(74, 163, 225, 0.4);
+      border-color: #4aa3e1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background image -->
+  <div class="bg-image"></div>
+
+  <!-- Navigation links -->
+  <div class="nav-links">
+    <a href="original-crt-demo.html" class="active">Main</a>
+    <a href="crt-demo.html">Playground</a>
+    <a href="scoped-crt-demo.html">Scoped Barrel</a>
+    <a href="z-index-test.html">Z-Index Test</a>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="demo-wrapper">
+    <section class="hero">
+      <div>
+        <h1>CRT OVERLAY</h1>
+        <p>Self-contained Web Component with scanlines, phosphor triads, barrel distortion, bloom, and flicker — drop it on any page, no shims needed.</p>
+      </div>
+    </section>
+
+    <div class="terminal-grid">
+      <article id="features" class="terminal">
+        <div class="terminal-header"><span>feature-list</span></div>
+        <div class="terminal-body">
+          <h3>✨ Core Effects</h3>
+          <ul>
+            <li><strong>Scanlines</strong> - Shadow-mask scanlines with animated hairlines and phosphor triads (RGB/custom colors)</li>
+            <li><strong>Chromatic Aberration</strong> - Color fringing with configurable jitter animation</li>
+            <li><strong>Bloom/Halation</strong> - Screen glow with blur and brightness control (capped at 1.5px for performance)</li>
+            <li><strong>Glass Reflection</strong> - Optional reflection layer with position/size control</li>
+            <li><strong>Vignette</strong> - Edge darkening with customizable radius and feather</li>
+            <li><strong>Film Grain</strong> - 60-frame noise pool with configurable opacity</li>
+            <li><strong>Flicker</strong> - Random scanline flicker animation (toggleable)</li>
+          </ul>
+          <h3>⚙️ Advanced</h3>
+          <ul>
+            <li><strong>Barrel Distortion</strong> - SVG-based lens curvature (scoped or global)</li>
+            <li><strong>Scanline Masks</strong> - 5 types: shadow-mask, aperture-grille, slot-mask, sharp, soft</li>
+            <li><strong>Z-Index Modes</strong> - Behind content (z:-1), on top (z:9999), or disabled</li>
+            <li><strong>21 Presets</strong> - Desktop CRTs, arcade, terminal, phosphor colors, professional, specialized</li>
+            <li><strong>Dynamic Controls</strong> - Dual slider/number inputs, collapsible sections, preset selector</li>
+            <li><strong>No Dependencies</strong> - Works in vanilla JS, React, Vue, Angular, etc.</li>
+          </ul>
+          <div class="link-row">
+            <a class="btn" href="./crt-demo.html">Try the sandbox</a>
+            <a class="btn secondary" href="./scoped-crt-demo.html">See scoped barrel</a>
+            <a class="btn secondary" href="./z-index-test.html">Test z-index modes</a>
+          </div>
+        </div>
+      </article>
+
+      <article id="usage" class="terminal">
+        <div class="terminal-header"><span>usage-examples</span></div>
+        <div class="terminal-body">
+          <h3>Minimal (controls only)</h3>
+          <div class="code-block">&lt;script type="module" src="crt-overlay.js"&gt;&lt;/script&gt;
+&lt;crt-overlay controls&gt;&lt;/crt-overlay&gt;</div>
+
+          <h3>Default preset (behind content)</h3>
+          <div class="code-block">&lt;crt-overlay
+  controls
+  scan-opacity="0.85"
+  hairline-opacity="0.18"
+  fringe-opacity="0.25"
+  noise-opacity="0.22"
+  barrel="2"
+  bloom="0.15"
+  flicker
+  mode="1"
+&gt;&lt;/crt-overlay&gt;</div>
+
+          <h3>On top of everything</h3>
+          <div class="code-block">&lt;crt-overlay
+  controls
+  mode="2"
+&gt;&lt;/crt-overlay&gt;</div>
+
+          <h3>Scoped barrel (specific element only)</h3>
+          <div class="code-block">&lt;crt-overlay
+  controls
+  apply-barrel-to=".monitor-card"
+  barrel="2.4"
+&gt;&lt;/crt-overlay&gt;</div>
+
+          <h3>JavaScript API</h3>
+          <div class="code-block">const overlay = document.querySelector('crt-overlay');
+
+// Update settings
+overlay.updateConfig({ barrel: 2.5, bloom: 0.18 });
+
+// Apply preset
+overlay.applyPreset('arcade-crt');
+
+// Listen for changes
+overlay.addEventListener('config-change', (e) => {
+  console.log('Config updated:', e.detail);
+});</div>
+
+          <h3>Z-Index Modes (via controls or mode attribute)</h3>
+          <div class="code-block">mode="0"  // Disabled - no rendering
+mode="1"  // Behind content (z-index: -1) - default
+mode="2"  // On top (z-index: 9999)</div>
+        </div>
+      </article>
+
+      <article class="terminal">
+        <div class="terminal-header"><span>notes</span></div>
+        <div class="terminal-body">
+          <h3>What you get</h3>
+          <ul>
+            <li>Overlay visuals rendered via Shadow DOM layers; no page markup changes required.</li>
+            <li>Bloom is handled by the component (no page-side filters needed).</li>
+            <li>Barrel distortion exported as a namespaced CSS var; opt-in per selector.</li>
+            <li>Controls stay clickable regardless of z-index; hide them by omitting <code>controls</code>.</li>
+            <li>Flicker is internal; subscribe to <code>flicker</code> if you want to react.</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- CRT Overlay Component with controls enabled -->
+  <crt-overlay 
+    scan-opacity="0.85"
+    hairline-opacity="0.18"
+    fringe-opacity="0.25"
+    noise-opacity="0.22"
+    barrel="2"
+    scan-size="4"
+    scan-density="2"
+    phosphor-size="1"
+    bloom="0.15"
+    flicker
+    controls
+  ></crt-overlay>
+
+  <script type="module">
+    // import the new isolated component for testing
+    import '../component/crt-overlay.js';
+
+    // Ensure custom element is defined before use
+    customElements.whenDefined('crt-overlay');
+  </script>
+</body>
+</html>

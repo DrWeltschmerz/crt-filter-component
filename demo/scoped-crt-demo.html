@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CRT Overlay Demo - Scoped Barrel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, #05070a, #071426);
+      color: #e6f7ff;
+      overflow-x: hidden;
+    }
+    .page-background { position: fixed; inset: 0; background: linear-gradient(180deg, #05070a, #071426); z-index: -100; }
+    .demo-wrapper { position: fixed; inset: 0; overflow-y: auto; overflow-x: hidden; }
+    .demo-wrapper::-webkit-scrollbar { width: 8px; }
+    .demo-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    .demo-wrapper::-webkit-scrollbar-thumb { background-color: #ff8a1f; border-radius: 4px; }
+    
+    .nav-links {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(74, 163, 225, 0.15);
+      border: 1px solid rgba(74, 163, 225, 0.3);
+      text-decoration: none;
+      color: #e6f7ff;
+      transition: all 0.2s ease;
+    }
+    .nav-links a:hover {
+      background: rgba(74, 163, 225, 0.3);
+      border-color: rgba(74, 163, 225, 0.6);
+    }
+    .nav-links a.active {
+      background: rgba(74, 163, 225, 0.4);
+      border-color: #4aa3e1;
+    }
+
+    .page { max-width: 1200px; margin: 0 auto; padding: 100px 24px 48px; position: relative; z-index: 2; }
+    header { padding: 20px 0 12px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; }
+    header h1 { margin: 0; font-size: 2rem; letter-spacing: -0.01em; }
+    header p { margin: 6px 0 0; color: rgba(230,247,255,0.75); }
+
+    .stack { display: grid; gap: 18px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+    .card h2 { margin: 0 0 8px; font-size: 1.15rem; color: #ffb35c; }
+    .card p { margin: 0 0 10px; color: rgba(230,247,255,0.82); line-height: 1.6; }
+
+    .scoped-target {
+      background: linear-gradient(180deg, rgba(255,138,31,0.1), rgba(74,163,225,0.08));
+      border: 2px dashed rgba(255,138,31,0.4);
+    }
+    .scoped-target h2 { color: #ff8a1f; }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+      object-fit: cover;
+      min-height: 160px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+
+    .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .btn {
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.55);
+      color: #4aa3e1;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(74,163,225,0.2); }
+    .btn.alt { color: #ffb35c; border-color: rgba(255,138,31,0.4); box-shadow: 0 10px 30px rgba(255,138,31,0.2); }
+
+    .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+    .panel {
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.35);
+    }
+    .panel h3 { margin: 0 0 8px; font-size: 1rem; color: #4aa3e1; }
+    .panel p { margin: 0; color: rgba(230,247,255,0.8); line-height: 1.5; }
+
+    .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+    .list li {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .list strong { color: #ffb35c; }
+
+    code {
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #ff8a1f;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-background"></div>
+  <div class="bg-image"></div>
+  <div class="nav-links">
+    <a href="original-crt-demo.html">Main</a>
+    <a href="crt-demo.html">Playground</a>
+    <a href="scoped-crt-demo.html" class="active">Scoped Barrel</a>
+    <a href="z-index-test.html">Z-Index Test</a>
+  </div>
+
+  <div class="demo-wrapper">
+    <div class="page">
+      <header>
+        <h1>Scoped Barrel Distortion</h1>
+        <p>Barrel distortion applied only to the highlighted card below. Other content stays straight.</p>
+      </header>
+
+      <main class="stack">
+        <section class="card scoped-target">
+          <h2>Target: Barrel distortion applied here</h2>
+          <p>This card is the target for <code>apply-barrel-to=".scoped-target"</code>. Only this element will have the barrel curvature effect applied. All other overlay effects (scanlines, bloom, fringe, noise) render over the entire viewport.</p>
+          <div class="gallery">
+            <img src="https://picsum.photos/seed/scope-1/800/400" alt="Scoped 1">
+            <img src="https://picsum.photos/seed/scope-2/700/400" alt="Scoped 2">
+          </div>
+          <div class="buttons">
+            <a class="btn" href="#">Action</a>
+            <a class="btn alt" href="#">Secondary</a>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Outside target</h2>
+          <p>This card is <strong>not</strong> targeted by barrel distortion. It remains undistorted while the scoped card above curves with the barrel effect. Useful when you only want the CRT curvature on a hero section or specific media block.</p>
+        </section>
+
+        <section class="card">
+          <h2>How it works</h2>
+          <div class="split">
+            <div class="panel">
+              <h3>Scoped approach</h3>
+              <p>The <code>apply-barrel-to</code> attribute targets a CSS selector. The barrel distortion SVG filter only renders on that element, leaving the rest of the page flat.</p>
+            </div>
+            <div class="panel">
+              <h3>Mode control</h3>
+              <p>Use the controls (top-right) to switch between Behind and On Top modes. Both work independently of the barrel scoping.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Features demonstrated</h2>
+          <ul class="list">
+            <li><strong>Scoped barrel</strong> — Distortion limited to <code>.scoped-target</code> class.</li>
+            <li><strong>Global effects</strong> — Scanlines, bloom, fringe cover the entire viewport.</li>
+            <li><strong>Mode switching</strong> — Toggle behind/on top behavior from controls.</li>
+            <li><strong>Visual hierarchy</strong> — Navigation stays at z-index 1000, always accessible.</li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import '../component/crt-overlay.js';
+  </script>
+
+  <crt-overlay
+    scan-opacity="0.85"
+    hairline-opacity="0.18"
+    fringe-opacity="0.25"
+    noise-opacity="0.22"
+    barrel="2"
+    scan-size="4"
+    scan-density="2"
+    phosphor-size="1"
+    bloom="0.15"
+    flicker
+    controls
+    apply-barrel-to=".scoped-target"
+    mode="1"
+  ></crt-overlay>
+
+</body>
+</html>

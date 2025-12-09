@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+
+# Archive (old files)
+_archive/
+
+*~
+
+*.bak
+# Environment
+.env
+.env.local
+
+# Development
+*.log
+.cache/

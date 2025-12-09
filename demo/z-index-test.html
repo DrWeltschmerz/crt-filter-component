@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRT Overlay - Z-Index Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, #05070a, #071426);
+      color: #e6f7ff;
+      overflow-x: hidden;
+    }
+
+    .demo-wrapper {
+      min-height: 100vh;
+      position: relative;
+      z-index: 0;
+      overflow-x: hidden;
+    }
+
+    /* Background image - lowest layer */
+    .bg-image {
+      position: fixed;
+      inset: 0;
+      background: url('../assets/city.jpg') center bottom / cover no-repeat;
+      opacity: 0.85;
+      z-index: -2;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      color: #4aa3e1;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .z-demo-info {
+      background: rgba(255, 138, 31, 0.1);
+      border: 1px solid rgba(255, 138, 31, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 2rem auto;
+      max-width: 600px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 5;
+    }
+
+    .z-demo-info strong {
+      color: #ff8a1f;
+    }
+
+    /* Button layers - different z-indexes to demonstrate stacking */
+    .btn-layer {
+      margin: 2rem auto;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.75);
+      border: 2px solid;
+      color: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Z-index demonstration buttons */
+    .btn-z-minus-5 {
+      z-index: -5;
+      border-color: #ff4444;
+      background: rgba(255, 68, 68, 0.2);
+      color: #ff8888;
+    }
+
+    .btn-z-0 {
+      z-index: 0;
+      border-color: #ffaa44;
+      background: rgba(255, 170, 68, 0.2);
+      color: #ffcc88;
+    }
+
+    .btn-z-5 {
+      z-index: 5;
+      border-color: #44aaff;
+      background: rgba(68, 170, 255, 0.2);
+      color: #88ccff;
+    }
+
+    .btn-z-10 {
+      z-index: 10;
+      border-color: #44ff44;
+      background: rgba(68, 255, 68, 0.2);
+      color: #88ff88;
+    }
+
+    .btn-z-50 {
+      z-index: 50;
+      border-color: #ff44ff;
+      background: rgba(255, 68, 255, 0.2);
+      color: #ff88ff;
+    }
+
+    /* Content sections with different z-indexes */
+    .content-section {
+      max-width: 1000px;
+      margin: 4rem auto;
+      padding: 2rem;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .section-z-minus-1 {
+      z-index: -1;
+      background: rgba(255, 100, 100, 0.15);
+      border: 2px solid rgba(255, 100, 100, 0.3);
+    }
+
+    .section-z-3 {
+      z-index: 3;
+      background: rgba(100, 200, 255, 0.15);
+      border: 2px solid rgba(100, 200, 255, 0.3);
+    }
+
+    .section-z-8 {
+      z-index: 8;
+      background: rgba(100, 255, 100, 0.15);
+      border: 2px solid rgba(100, 255, 100, 0.3);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .section-desc {
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #ff8a1f;
+    }
+
+    .nav-links {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(74, 163, 225, 0.15);
+      border: 1px solid rgba(74, 163, 225, 0.3);
+      text-decoration: none;
+      color: #e6f7ff;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(74, 163, 225, 0.3);
+      border-color: rgba(74, 163, 225, 0.6);
+    }
+
+    .nav-links a.active {
+      background: rgba(74, 163, 225, 0.4);
+      border-color: #4aa3e1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background image at z-index: -2 -->
+  <div class="bg-image"></div>
+
+  <!-- Navigation links -->
+  <div class="nav-links">
+    <a href="original-crt-demo.html">Main</a>
+    <a href="crt-demo.html">Playground</a>
+    <a href="scoped-crt-demo.html">Scoped Barrel</a>
+    <a href="z-index-test.html" class="active">Z-Index Test</a>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="demo-wrapper">
+    <section class="hero">
+      <div>
+        <h1>Z-INDEX STACKING TEST</h1>
+        <p>This page demonstrates how the CRT overlay interacts with elements at different z-index layers. Use the controls to adjust the overlay's z-index and see which elements appear above or below it.</p>
+        
+        <div class="z-demo-info">
+          <strong>How to test:</strong><br>
+          1. Open CRT controls (bottom-right)<br>
+          2. Change the "Mode" dropdown<br>
+          3. Watch how the overlay interacts with buttons and sections<br>
+          <strong>Modes:</strong><br>
+          - Disabled: Overlay is hidden<br>
+          - Behind Content: Overlay at z-index -1, below page elements<br>
+          - On Top: Overlay at z-index 9999, above everything
+        </div>
+
+        <div class="btn-layer">
+          <button class="btn btn-z-minus-5">Button z:-5</button>
+          <button class="btn btn-z-0">Button z:0</button>
+          <button class="btn btn-z-5">Button z:5</button>
+          <button class="btn btn-z-10">Button z:10</button>
+          <button class="btn btn-z-50">Button z:50</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-section section-z-minus-1">
+      <h2 class="section-title">Section at z-index: -1</h2>
+      <p class="section-desc">
+        This section should be behind most content but above the background image (z:-2).
+        When overlay is at z:-1, they share the same layer (DOM order determines visibility).
+      </p>
+    </div>
+
+    <div class="content-section section-z-3">
+      <h2 class="section-title">Section at z-index: 3</h2>
+      <p class="section-desc">
+        This section appears above overlay when overlay z &lt; 3.
+        When overlay z ≥ 3, the overlay will cover this section.
+      </p>
+    </div>
+
+    <div class="content-section section-z-8">
+      <h2 class="section-title">Section at z-index: 8</h2>
+      <p class="section-desc">
+        This section appears above overlay when overlay z &lt; 8.
+        It will stay visible for most overlay settings unless you set overlay to z:10+.
+      </p>
+    </div>
+
+    <div class="content-section section-z-3" style="margin-bottom: 6rem;">
+      <h2 class="section-title">Expected Behavior</h2>
+      <div class="section-desc">
+        <ul style="list-style-position: inside; line-height: 2;">
+          <li><strong>Mode: Disabled</strong> - Overlay is completely hidden, no visual effect</li>
+          <li><strong>Mode: Behind Content</strong> - Overlay at z-index: -1, below all page elements, effects on background only</li>
+          <li><strong>Mode: On Top</strong> - Overlay at z-index: 9999, above all page elements including buttons and content sections</li>
+        </ul>
+        <p style="margin-top: 1rem;"><strong>Note:</strong> The overlay now uses a simple 3-mode system for reliable z-index positioning. For z-index to work properly, elements must have <code>position: relative</code>, <code>absolute</code>, or <code>fixed</code>. Static elements ignore z-index.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRT Overlay Component - 3 simple modes -->
+  <crt-overlay 
+    mode="1"
+    scan-opacity="0.85"
+    hairline-opacity="0.18"
+    fringe-opacity="0.25"
+    noise-opacity="0.22"
+    barrel="2"
+    scan-size="4"
+    scan-density="2"
+    phosphor-size="1"
+    bloom="0.15"
+    flicker
+    controls
+  ></crt-overlay>
+
+  <script type="module">
+    import '../component/crt-overlay.js';
+  </script>
+</body>
+</html>

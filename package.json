@@ -1,0 +1,42 @@
+{
+  "name": "crt-overlay",
+  "version": "1.0.0",
+  "description": "Self-contained Web Component for authentic CRT monitor effects with scanlines, chromatic aberration, bloom, and more.",
+  "type": "module",
+  "main": "component/crt-overlay.js",
+  "exports": {
+    ".": "./component/crt-overlay.js"
+  },
+  "files": [
+    "component/crt-overlay.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "demo": "python3 -m http.server 8000 --directory ."
+  },
+  "keywords": [
+    "crt",
+    "monitor",
+    "effect",
+    "overlay",
+    "web-component",
+    "scanlines",
+    "vintage",
+    "retro",
+    "phosphor",
+    "bloom",
+    "aberration",
+    "filter"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/[username]/crt-overlay",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/[username]/crt-overlay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/[username]/crt-overlay/issues"
+  }
+}
